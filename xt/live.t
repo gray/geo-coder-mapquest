@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use Encode;
 use Geo::Coder::Mapquest;
-use Test::More tests => 2;
+use Test::More;
 
 unless ($ENV{MAPQUEST_APIKEY}) {
     plan skip_all => 'MAPQUEST_APIKEY environment variable must be set';
+}
+else {
+    plan tests => 2;
 }
 
 my $geocoder = Geo::Coder::Mapquest->new(apikey => $ENV{MAPQUEST_APIKEY});
