@@ -103,16 +103,31 @@ object.
     $location = $geocoder->geocode(location => $location)
     @locations = $geocoder->geocode(location => $location)
 
-In scalar context, this method returns the first location result; and
-in list context it returns all locations results.
+In scalar context, this method returns the first location result; and in list
+context it returns all locations results.
 
 Each location result is a hashref; a typical example looks like:
 
-{
-}
-
-If the location contains non-ASCII characters, ensure it is a Unicode-
-flagged string or consists of UTF-8 bytes.
+   {
+        adminArea1         => "US",
+        adminArea1Type     => "Country",
+        adminArea3         => "CA",
+        adminArea3Type     => "State",
+        adminArea4         => "Los Angeles County",
+        adminArea4Type     => "County",
+        adminArea5         => "Los Angeles",
+        adminArea5Type     => "City",
+        displayLatLng      => { lat => "34.10155", lng => "-118.33869" },
+        dragPoint          => 0,
+        geocodeQuality     => "INTERSECTION",
+        geocodeQualityCode => "I1BAA",
+        latLng             => { lat => "34.10155", lng => "-118.33869" },
+        linkId             => 0,
+        postalCode         => 90028,
+        sideOfStreet       => "N",
+        street             => "Hollywood Blvd & N Highland Ave",
+        type               => "s",
+    }
 
 =head2 ua
 
@@ -123,7 +138,7 @@ Accessor for the UserAgent object.
 
 =head1 NOTES
 
-The geocoding results are not production quality at this time. International 
+The geocoding results are not production quality at this time. International
 queries produce no results and US addresses frequently only return results
 that are only accurate to the country-level.
 
