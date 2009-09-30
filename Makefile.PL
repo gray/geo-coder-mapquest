@@ -9,10 +9,12 @@ my %conf = (
     VERSION_FROM  => 'lib/Geo/Coder/Mapquest.pm',
     ABSTRACT_FROM => 'lib/Geo/Coder/Mapquest.pm',
     PREREQ_PM     => {
+        'Encode'         => 0,
         'JSON'           => 2.0,
         'LWP::UserAgent' => 0,
         'Test::More'     => 0,
         'URI'            => 1.36,
+        'URI::Escape'    => 0,
     },
     META_MERGE    => {
         resources => {

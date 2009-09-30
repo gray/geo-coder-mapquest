@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use Encode ();
 use JSON;
 use LWP::UserAgent;
 use URI;
@@ -44,18 +45,26 @@ sub ua {
 sub geocode {
     my $self = shift;
 
-    my $location = @_ % 2 ? $_[0] : $_[0] eq 'location' ? $_[1] : '';
-    return unless $location;
+    my %params   = (@_ % 2) ? (location => shift, @_) : @_;
+    my $location = $params{location} or return;
+    my $country  = $params{country};
+
+    $location = Encode::encode('utf-8', $location);
 
     my $uri = URI->new(
         'http://platform.beta.mapquest.com/geocoding/v1/address'
     );
-    $uri->query_form(key => $self->{key}, location => $location);
+    $uri->query_form(
+        key      => $self->{key},
+        location => $location,
+        $country ? (adminArea1 => $country) : (),
+
+    );
 
     my $res = $self->ua->get($uri);
     return unless $res->is_success;
 
-    my $data = eval { decode_json($res->decoded_content) };
+    my $data = eval { from_json($res->decoded_content) };
     return unless $data;
 
     my @results = @{ $data->{locations} || [] };

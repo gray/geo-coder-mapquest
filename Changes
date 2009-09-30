@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-Mapquest
 
+0.03
+    - Location is no longer limited to only unicode-flagged strings or
+      UTF-8 bytes.
+    - Updated example script to use apikey.
+
 0.02  Sat Sep 19 08:52:40 UTC 2009
     - Added missing example of location data format.
     - Added file portability author test.
