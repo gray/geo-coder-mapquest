@@ -104,12 +104,12 @@ object.
     $location = $geocoder->geocode(location => $location)
     @locations = $geocoder->geocode(location => $location)
 
-In scalar context, this method returns the first location result; and in list
-context it returns all locations results.
+In scalar context, this method returns the first location result; and in
+list context it returns all locations results.
 
 Each location result is a hashref; a typical example looks like:
 
-   {
+    {
         adminArea1         => "US",
         adminArea1Type     => "Country",
         adminArea3         => "CA",
