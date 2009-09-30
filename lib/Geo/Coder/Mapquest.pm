@@ -153,7 +153,8 @@ queries produce no results and US addresses frequently only return results
 that are only accurate to the country-level.
 
 An API key can be obtained here:
-L<http://developer.mapquest.com/Home/WhyJoin>.
+L<http://developer.mapquest.com/Home/WhyJoin>. Make sure to choose the free
+developer account and not the free edition account type.
 
 Note that Mapquest already url-encodes the key, so the geocoder constructor
 will prevent it from being doubly-encoded. Ensure you do not decode it
