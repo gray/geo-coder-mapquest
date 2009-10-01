@@ -167,7 +167,8 @@ account.
 
 L<http://platform.beta.mapquest.com/geocoding/>
 
-L<Geo::Coder::Bing>, L<Geo::Coder::Google>, L<Geo::Coder::Yahoo>
+L<Geo::Coder::Bing>, L<Geo::Coder::Google>, L<Geo::Coder::Multimap>,
+L<Geo::Coder::Yahoo>
 
 =head1 REQUESTS AND BUGS
 
