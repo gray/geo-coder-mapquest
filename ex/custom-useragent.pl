@@ -24,6 +24,7 @@ $ua->env_proxy;
 my $geocoder = Geo::Coder::Mapquest->new(
     apikey => $ENV{MAPQUEST_APIKEY},
     ua     => $ua,
+    debug  => 1,
 );
 my $result = $geocoder->geocode(location => $location);
 

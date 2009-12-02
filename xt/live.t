@@ -11,7 +11,11 @@ else {
     plan tests => 8;
 }
 
-my $geocoder = Geo::Coder::Mapquest->new(apikey => $ENV{MAPQUEST_APIKEY});
+my $geocoder = Geo::Coder::Mapquest->new(
+    apikey => $ENV{MAPQUEST_APIKEY},
+    debug  => $ENV{MAPQUEST_DEBUG} || 0,
+);
+
 {
     my $address = 'Hollywood & Highland, Los Angeles, CA';
     my $location = $geocoder->geocode($address);
@@ -21,22 +25,30 @@ my $geocoder = Geo::Coder::Mapquest->new(apikey => $ENV{MAPQUEST_APIKEY});
     my @locations = $geocoder->geocode('Main Street, Los Angeles, CA');
     ok(@locations > 1, 'there are many Main Streets in Los Angeles, CA');
 }
-TODO: {
-    local $TODO = 'International locations';
+{
     my $address = qq(Ch\xE2teau d Uss\xE9, 37420);
 
     my $location = $geocoder->geocode($address, country => 'FR');
     ok($location, 'latin1 bytes');
-    is($location->{adminArea1}, 'FR', 'latin1 bytes');
+    TODO: {
+        local $TODO = 'International locations';
+        is($location->{adminArea1}, 'FR', 'latin1 bytes');
+    }
 
     $location = $geocoder->geocode(decode('latin1', $address), country => 'FR');
     ok($location, 'UTF-8 characters');
-    is($location->{adminArea1}, 'FR', 'UTF-8 characters');
+    TODO: {
+        local $TODO = 'International locations';
+        is($location->{adminArea1}, 'FR', 'UTF-8 characters');
+    }
 
     $location = $geocoder->geocode(
         encode('utf-8', decode('latin1', $address)), country => 'FR',
     );
     ok($location, 'UTF-8 bytes');
-    is($location->{adminArea1}, 'FR', 'UTF-8 bytes');
+    TODO: {
+        local $TODO = 'International locations';
+        is($location->{adminArea1}, 'FR', 'UTF-8 bytes');
+    }
 }
 

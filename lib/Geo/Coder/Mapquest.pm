@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use URI;
 use URI::Escape qw(uri_unescape);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;
 
 sub new {
@@ -22,11 +22,13 @@ sub new {
         key => uri_unescape($key),
     }, $class;
 
-    if ($params{ua}) {
-        $self->ua($params{ua});
-    }
-    else {
-        $self->{ua} = LWP::UserAgent->new(agent => "$class/$VERSION");
+    $self->ua(
+        $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
+    );
+
+    if ($params{debug}) {
+        $self->ua->add_handler(request_send  => sub { warn shift->dump; return });
+        $self->ua->add_handler(response_done => sub { warn shift->dump; return });
     }
 
     return $self;
@@ -52,7 +54,7 @@ sub geocode {
     $location = Encode::encode('utf-8', $location);
 
     my $uri = URI->new(
-        'http://platform.beta.mapquest.com/geocoding/v1/address'
+        'http://www.mapquestapi.com/geocoding/v1/address'
     );
     $uri->query_form(
         key      => $self->{key},
@@ -67,7 +69,7 @@ sub geocode {
     my $data = eval { from_json($res->decoded_content) };
     return unless $data;
 
-    my @results = @{ $data->{locations} || [] };
+    my @results = @{ $data->{results}[0]{locations} || [] };
     return wantarray ? @results : $results[0];
 }
 
@@ -78,7 +80,7 @@ __END__
 
 =head1 NAME
 
-Geo::Coder::Mapquest - Geocode addresses with Mapquest (beta)
+Geo::Coder::Mapquest - Geocode addresses with Mapquest
 
 =head1 SYNOPSIS
 
@@ -91,8 +93,8 @@ Geo::Coder::Mapquest - Geocode addresses with Mapquest (beta)
 
 =head1 DESCRIPTION
 
-The C<Geo::Coder::Mapquest> module provides an interface to the Beta
-Mapquest Geocoding Web Service.
+The C<Geo::Coder::Mapquest> module provides an interface to the Mapquest
+Geocoding Web Service.
 
 =head1 METHODS
 
@@ -130,9 +132,10 @@ Each location result is a hashref; a typical example looks like:
         displayLatLng      => { lat => "34.10155", lng => "-118.33869" },
         dragPoint          => 0,
         geocodeQuality     => "INTERSECTION",
-        geocodeQualityCode => "I1BAA",
+        geocodeQualityCode => "I1CAA",
         latLng             => { lat => "34.10155", lng => "-118.33869" },
         linkId             => 0,
+        mapUrl             => "http://www.mapquestapi.com/staticmap/v3/getmap?type=map&size=225,160&pois=purple-1,34.10155,-118.33869,0,0|&center=34.10155,-118.33869&zoom=12&key=Dmjtd|lu612ha7ng,ag=o5-5at2u&rand=1659284599",
         postalCode         => 90028,
         sideOfStreet       => "N",
         street             => "Hollywood Blvd & N Highland Ave",
@@ -148,24 +151,22 @@ Accessor for the UserAgent object.
 
 =head1 NOTES
 
-The geocoding results are not production quality at this time. International
-queries produce no results and US addresses frequently only return results
-that are only accurate to the country-level.
-
 An API key can be obtained here:
-L<http://developer.mapquest.com/Home/WhyJoin>. Make sure to choose the free
-developer account and not the free edition account type.
+L<http://developer.mapquest.com/web/info/account/app-keys>.
+
+After obtaining a key, you must enable the I<Blank Referers> option for the
+account.
 
 Note that Mapquest already url-encodes the key, so the geocoder constructor
 will prevent it from being doubly-encoded. Ensure you do not decode it
 yourself before passing it to the constructor.
 
-After obtaining a key, you must enable the I<Blank Referers> option for the
-account.
+International (non-US) queries do not appear to be fully supported by the
+service at this time.
 
 =head1 SEE ALSO
 
-L<http://platform.beta.mapquest.com/geocoding/>
+L<http://www.mapquestapi.com/geocoding/>
 
 L<Geo::Coder::Bing>, L<Geo::Coder::Google>, L<Geo::Coder::Multimap>,
 L<Geo::Coder::Yahoo>

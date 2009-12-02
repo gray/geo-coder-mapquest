@@ -1,8 +1,10 @@
 Revision history for Geo-Coder-Mapquest
 
 0.03
+    - Updated to reflect Mapquest moved the service out of beta.
     - Location is no longer limited to only unicode-flagged strings or
       UTF-8 bytes.
+    - Added support for debug parameter.
     - Updated example script to use apikey.
 
 0.02  Sat Sep 19 08:52:40 UTC 2009
