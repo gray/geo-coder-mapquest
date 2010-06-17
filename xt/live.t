@@ -16,8 +16,7 @@ unless ($debug) {
     diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data";
 }
 
-my $has_ssl = eval { require Crypt::SSLeay; 1 } or
-    eval { require IO::Socket::SSL; 1 };
+my $has_ssl = eval { require Net::HTTPS; 1 };
 
 my $geocoder = Geo::Coder::Mapquest->new(
     apikey => $ENV{MAPQUEST_APIKEY},
