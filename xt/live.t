@@ -8,12 +8,20 @@ unless ($ENV{MAPQUEST_APIKEY}) {
     plan skip_all => 'MAPQUEST_APIKEY environment variable must be set';
 }
 else {
-    plan tests => 8;
+    plan tests => 14;
 }
+
+my $debug = $ENV{GEO_CODER_MAPQUEST_DEBUG};
+unless ($debug) {
+    diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data";
+}
+
+my $has_ssl = eval { require Crypt::SSLeay; 1 } or
+    eval { require IO::Socket::SSL; 1 };
 
 my $geocoder = Geo::Coder::Mapquest->new(
     apikey => $ENV{MAPQUEST_APIKEY},
-    debug  => $ENV{MAPQUEST_DEBUG} || 0,
+    debug  => $debug,
 );
 
 {
@@ -35,7 +43,10 @@ my $geocoder = Geo::Coder::Mapquest->new(
         is($location->{adminArea1}, 'FR', 'latin1 bytes');
     }
 
-    $location = $geocoder->geocode(decode('latin1', $address), country => 'FR');
+    $location = $geocoder->geocode(
+        location => decode('latin1', $address),
+        country  => 'FR'
+    );
     ok($location, 'UTF-8 characters');
     TODO: {
         local $TODO = 'International locations';
@@ -43,7 +54,8 @@ my $geocoder = Geo::Coder::Mapquest->new(
     }
 
     $location = $geocoder->geocode(
-        encode('utf-8', decode('latin1', $address)), country => 'FR',
+        location => encode('utf-8', decode('latin1', $address)),
+        country  => 'FR',
     );
     ok($location, 'UTF-8 bytes');
     TODO: {
@@ -52,3 +64,35 @@ my $geocoder = Geo::Coder::Mapquest->new(
     }
 }
 
+my @addresses = (
+    'Los Liones Dr, Pacific Palisades, CA 90272',
+    '2001 North Fuller Avenue, Los Angeles, CA',
+    '4730 Crystal Springs Drive, Los Angeles, CA',
+);
+
+{
+    my @locations = $geocoder->batch(\@addresses);
+    is(@locations, 3, 'batch - number of results');
+    for my $i (0..2) {
+        is(
+            $locations[$i]->[0]{providedLocation},
+            $addresses[$i], 'batch - result ' . ($i+1)
+        );
+    }
+}
+
+SKIP: {
+    skip 'no SSL support', 1 unless $has_ssl;
+
+    my $geocoder = Geo::Coder::Mapquest->new(
+        apikey => $ENV{MAPQUEST_APIKEY},
+        https  => 1,
+        debug  => $debug,
+    );
+    my $address = 'Hollywood & Highland, Los Angeles, CA';
+    my $location = $geocoder->geocode($address);
+    is($location->{postalCode}, 90028, 'https geocode');
+
+    my @locations = $geocoder->batch(\@addresses);
+    is(@locations, 3, 'https batch');
+}

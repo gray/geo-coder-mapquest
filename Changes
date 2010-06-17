@@ -1,6 +1,11 @@
 Revision history for Geo-Coder-Mapquest
 
-0.03
+0.04  Wed Jun 16 21:07:08 UTC 2010
+    - Added https option.
+    - Added batch method.
+    - Added providedLocation field to the returned locations.
+
+0.03  Wed Dec 2 09:36:30 PST 2009
     - Updated to reflect Mapquest moved the service out of beta.
     - Location is no longer limited to only unicode-flagged strings or
       UTF-8 bytes.
