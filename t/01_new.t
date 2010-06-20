@@ -15,11 +15,12 @@ new_ok('Geo::Coder::Mapquest' => [apikey => 'Your API key', debug => 1]);
     };
     like($@, qr/^'apikey' is required/, 'apikey is required');
 
-    use Devel::Hide qw( Net::HTTPS );
+    my $ua = LWP::UserAgent->new(protocols_forbidden => ['https']);
     my $geocoder = eval {
         Geo::Coder::Mapquest->new(
             apikey => 'Your API key',
             https  => 1,
+            ua     => $ua,
         );
     };
     like($@, qr/^'https' requires/, 'https fails w/o an SSL module');

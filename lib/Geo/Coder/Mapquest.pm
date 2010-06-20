@@ -35,7 +35,7 @@ sub new {
 
     if ($params{https}) {
         croak q('https' requires Crypt::SSLeay or IO::Socket::SSL)
-            unless eval { require Net::HTTPS; 1 };
+            unless $self->ua->is_protocol_supported('https');
 
         $self->{https} = 1;
     }

@@ -21,8 +21,7 @@ my %conf = (
         'URI::Escape'    => 0,
     },
     BUILD_REQUIRES => {
-        'Devel::Hide' => 0,
-        'Test::More'  => 0.82,
+        'Test::More' => 0.82,
     },
     META_MERGE    => {
         resources => {
@@ -30,7 +29,6 @@ my %conf = (
         },
         recommends => {
             'JSON::XS'   => 2.0,
-            'Net::HTTPS' => 0,
             @recommends,
         },
     },
@@ -45,7 +43,6 @@ if ($conf{BUILD_REQUIRES} and $eumm_version < 6.5503) {
         %{ $conf{PREREQ_PM} || {} }, %{ delete $conf{BUILD_REQUIRES} },
     };
 }
-
 
 WriteMakefile(%conf);
 
