@@ -16,7 +16,6 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Devel::Hide
     Encode
     JSON
     LWP::UserAgent
