@@ -26,4 +26,4 @@ new_ok('Geo::Coder::Mapquest' => [apikey => 'Your API key', debug => 1]);
     like($@, qr/^'https' requires/, 'https fails w/o an SSL module');
 }
 
-can_ok('Geo::Coder::Mapquest', qw(geocode batch ua));
+can_ok('Geo::Coder::Mapquest', qw(geocode batch response ua));

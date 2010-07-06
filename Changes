@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Mapquest
 
+0.05
+    - Added response method.
+
 0.04  Wed Jun 16 21:07:08 UTC 2010
     - Added https option.
     - Added batch method.

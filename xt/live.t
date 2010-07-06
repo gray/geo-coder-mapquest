@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Encode qw(decode encode);
 use Geo::Coder::Mapquest;
+use LWP::UserAgent;
 use Test::More;
 
 unless ($ENV{MAPQUEST_APIKEY}) {
@@ -16,7 +17,7 @@ unless ($debug) {
     diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data";
 }
 
-my $has_ssl = eval { require Net::HTTPS; 1 };
+my $has_ssl = LWP::UserAgent->is_protocol_supported('https');
 
 my $geocoder = Geo::Coder::Mapquest->new(
     apikey => $ENV{MAPQUEST_APIKEY},

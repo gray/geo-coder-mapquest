@@ -43,6 +43,8 @@ sub new {
     return $self;
 }
 
+sub response { $_[0]->{response} }
+
 sub ua {
     my ($self, $ua) = @_;
     if ($ua) {
@@ -70,7 +72,7 @@ sub geocode {
         $country ? (adminArea1 => $country) : (),
     );
 
-    my $res = $self->ua->get($uri);
+    my $res = $self->{response} = $self->ua->get($uri);
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -80,16 +82,16 @@ sub geocode {
     my $data = eval { from_json($res->decoded_content) };
     return unless $data;
 
-    my @locations = @{ $data->{results}[0]{locations} || [] };
-    if (@locations) {
-        $#locations = 0 unless wantarray;
+    my @results = @{ $data->{results}[0]{locations} || [] };
+    if (@results) {
+        $#results = 0 unless wantarray;
 
         # Keep the location data structure flat.
         my $provided = $data->{results}[0]{providedLocation}{location};
-        $_->{providedLocation} = $provided for @locations;
+        $_->{providedLocation} = $provided for @results;
     }
 
-    return wantarray ? @locations : $locations[0];
+    return wantarray ? @results : $results[0];
 }
 
 sub batch {
@@ -109,7 +111,7 @@ sub batch {
         location => $locations,
     );
 
-    my $res = $self->ua->get($uri);
+    my $res = $self->{response} = $self->ua->get($uri);
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -178,7 +180,7 @@ object.
     @locations = $geocoder->geocode(location => $location)
 
 In scalar context, this method returns the first location result; and in
-list context it returns all locations results.
+list context it returns all location results.
 
 Each location result is a hashref; a typical example looks like:
 
@@ -213,6 +215,12 @@ Allows up to 100 locations to be geocoded in the same request.  Returns
 a list of results, each of which is a reference to a list of locations.
 Will croak if more than 100 locations are given.
 
+=head2 response
+
+    $response = $geocoder->response()
+
+Returns an L<HTTP::Response> object for the last submitted request. Can be
+used to determine the details of an error.
 
 =head2 ua
 
@@ -240,8 +248,9 @@ service at this time.
 
 L<http://www.mapquestapi.com/geocoding/>
 
-L<Geo::Coder::Bing>, L<Geo::Coder::Google>, L<Geo::Coder::Multimap>,
-L<Geo::Coder::Yahoo>
+L<Geo::Coder::Bing>, L<Geo::Coder::Bing::Bulk>, L<Geo::Coder::Google>,
+L<Geo::Coder::Multimap>, L<Geo::Coder::Navteq>, L<Geo::Coder::OSM>,
+L<Geo::Coder::TomTom>, L<Geo::Coder::Yahoo>
 
 =head1 REQUESTS AND BUGS
 
