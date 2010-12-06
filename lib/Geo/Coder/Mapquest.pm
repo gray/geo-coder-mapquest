@@ -287,7 +287,7 @@ L<http://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Mapquest>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Geo-Coder-Mapquest>
+L<http://search.cpan.org/dist/Geo-Coder-Mapquest/>
 
 =back
 
