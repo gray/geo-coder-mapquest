@@ -5,17 +5,12 @@ use Geo::Coder::Mapquest;
 use LWP::UserAgent;
 use Test::More;
 
-unless ($ENV{MAPQUEST_APIKEY}) {
-    plan skip_all => 'MAPQUEST_APIKEY environment variable must be set';
-}
-else {
-    plan tests => 14;
-}
+plan skip_all => 'MAPQUEST_APIKEY environment variable must be set'
+    unless $ENV{MAPQUEST_APIKEY};
 
 my $debug = $ENV{GEO_CODER_MAPQUEST_DEBUG};
-unless ($debug) {
-    diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data";
-}
+diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data"
+    unless $debug;
 
 my $has_ssl = LWP::UserAgent->is_protocol_supported('https');
 
@@ -96,3 +91,5 @@ SKIP: {
     my @locations = $geocoder->batch(\@addresses);
     is(@locations, 3, 'https batch');
 }
+
+done_testing;
