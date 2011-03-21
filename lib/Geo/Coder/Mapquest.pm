@@ -32,6 +32,9 @@ sub new {
         $self->ua->set_my_handler(request_send  => $dump_sub);
         $self->ua->set_my_handler(response_done => $dump_sub);
     }
+    elsif (exists $self->{compress} ? $self->{compress} : 1) {
+        $self->ua->default_header(accept_encoding => 'gzip,deflate');
+    }
 
     if ($params{https}) {
         croak q('https' requires Crypt::SSLeay or IO::Socket::SSL)
@@ -51,6 +54,7 @@ sub ua {
         croak q('ua' must be (or derived from) an LWP::UserAgent')
             unless ref $ua and $ua->isa(q(LWP::UserAgent));
         $self->{ua} = $ua;
+        $ua->ssl_opts(verify_hostname => 0) if $ua->can('ssl_opts');
     }
     return $self->{ua};
 }
@@ -72,7 +76,11 @@ sub geocode {
         $country ? (adminArea1 => $country) : (),
     );
 
-    my $res = $self->{response} = $self->ua->get($uri);
+    my $res = $self->{response} = $self->ua->get(
+        $uri,
+        'https' eq $uri->scheme
+            ? (if_ssl_cert_subject => "/CN=(?i)\Q@{[$uri->host]}\E\$") : ()
+    );
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -111,7 +119,11 @@ sub batch {
         location => $locations,
     );
 
-    my $res = $self->{response} = $self->ua->get($uri);
+    my $res = $self->{response} = $self->ua->get(
+        $uri,
+        'https' eq $uri->scheme
+            ? (if_ssl_cert_subject => "/CN=(?i)\Q@{[$uri->host]}\E\$") : ()
+    );
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
