@@ -1,6 +1,8 @@
 Revision history for Geo-Coder-Mapquest
 
-0.05
+0.05  Wed Mar 30 00:14:37 UTC 2011
+    - Required newer LWP with better HTTPS support.
+    - Enabled response compression by default
     - Added response method.
 
 0.04  Wed Jun 16 21:07:08 UTC 2010

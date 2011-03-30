@@ -10,7 +10,7 @@ use LWP::UserAgent;
 use URI;
 use URI::Escape qw(uri_unescape);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 
 sub new {
