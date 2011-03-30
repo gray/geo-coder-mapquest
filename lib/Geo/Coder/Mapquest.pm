@@ -19,15 +19,14 @@ sub new {
 
     my $key = $params{apikey} or croak q('apikey' is required);
 
-    my $self = bless {
-        key => uri_unescape($key),
-    }, $class;
+    my $self = bless \ %params, $class;
+    $self->{key} = uri_unescape($key),
 
     $self->ua(
         $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
     );
 
-    if ($params{debug}) {
+    if ($self->{debug}) {
         my $dump_sub = sub { $_[0]->dump(maxlength => 0); return };
         $self->ua->set_my_handler(request_send  => $dump_sub);
         $self->ua->set_my_handler(response_done => $dump_sub);
@@ -36,12 +35,8 @@ sub new {
         $self->ua->default_header(accept_encoding => 'gzip,deflate');
     }
 
-    if ($params{https}) {
-        croak q('https' requires Crypt::SSLeay or IO::Socket::SSL)
-            unless $self->ua->is_protocol_supported('https');
-
-        $self->{https} = 1;
-    }
+    croak q('https' requires LWP::Protocol::https)
+        if $self->{https} and not $self->ua->is_protocol_supported('https');
 
     return $self;
 }
@@ -54,7 +49,6 @@ sub ua {
         croak q('ua' must be (or derived from) an LWP::UserAgent')
             unless ref $ua and $ua->isa(q(LWP::UserAgent));
         $self->{ua} = $ua;
-        $ua->ssl_opts(verify_hostname => 0) if $ua->can('ssl_opts');
     }
     return $self->{ua};
 }
@@ -68,19 +62,15 @@ sub geocode {
 
     my $country = $params{country};
 
-    my $proto = $self->{https} ? 'https' : 'http';
-    my $uri = URI->new("$proto://www.mapquestapi.com/geocoding/v1/address");
+    my $uri = URI->new('http://www.mapquestapi.com/geocoding/v1/address');
     $uri->query_form(
         key      => $self->{key},
         location => $location,
         $country ? (adminArea1 => $country) : (),
     );
+    $uri->scheme('https') if $self->{https};
 
-    my $res = $self->{response} = $self->ua->get(
-        $uri,
-        'https' eq $uri->scheme
-            ? (if_ssl_cert_subject => "/CN=(?i)\Q@{[$uri->host]}\E\$") : ()
-    );
+    my $res = $self->{response} = $self->ua->get($uri);
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -112,18 +102,14 @@ sub batch {
 
     $_ = Encode::encode('utf-8', $_) for @$locations;
 
-    my $proto = $self->{https} ? 'https' : 'http';
-    my $uri = URI->new("$proto://www.mapquestapi.com/geocoding/v1/batch");
+    my $uri = URI->new('http://www.mapquestapi.com/geocoding/v1/batch');
     $uri->query_form(
         key      => $self->{key},
         location => $locations,
     );
+    $uri->scheme('https') if $self->{https};
 
-    my $res = $self->{response} = $self->ua->get(
-        $uri,
-        'https' eq $uri->scheme
-            ? (if_ssl_cert_subject => "/CN=(?i)\Q@{[$uri->host]}\E\$") : ()
-    );
+    my $res = $self->{response} = $self->ua->get($uri);
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -175,6 +161,11 @@ Geocoding Web Service.
 =head2 new
 
     $geocoder = Geo::Coder::Mapquest->new(apikey => 'Your API key')
+    $geocoder = Geo::Coder::Mapquest->new(
+        apikey => 'Your API key'
+        https  => 1,
+        debug  => 1,
+    )
 
 Creates a new geocoding object.
 
