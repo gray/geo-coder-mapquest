@@ -14,8 +14,12 @@ diag "Set GEO_CODER_MAPQUEST_DEBUG to see request/response data"
 
 my $has_ssl = LWP::UserAgent->is_protocol_supported('https');
 
+my $open = 0;
+GOTO:
+
 my $geocoder = Geo::Coder::Mapquest->new(
     apikey => $ENV{MAPQUEST_APIKEY},
+    open   => $open,
     debug  => $debug,
 );
 
@@ -90,6 +94,12 @@ SKIP: {
 
     my @locations = $geocoder->batch(\@addresses);
     is(@locations, 3, 'https batch');
+}
+
+unless ($open) {
+    diag 'Testing opendata server';
+    $open = 1;
+    goto 'GOTO';
 }
 
 done_testing;

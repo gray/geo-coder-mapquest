@@ -22,6 +22,9 @@ sub new {
     my $self = bless \ %params, $class;
     $self->{key} = uri_unescape($key),
 
+    $self->{host} = $params{host} ? $params{host}
+        : ($params{open} ? 'open' : 'www') . '.mapquestapi.com';
+
     $self->ua(
         $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
     );
@@ -62,7 +65,7 @@ sub geocode {
 
     my $country = $params{country};
 
-    my $uri = URI->new('http://www.mapquestapi.com/geocoding/v1/address');
+    my $uri = URI->new("http://$self->{host}/geocoding/v1/address");
     $uri->query_form(
         key      => $self->{key},
         location => $location,
@@ -102,7 +105,7 @@ sub batch {
 
     $_ = Encode::encode('utf-8', $_) for @$locations;
 
-    my $uri = URI->new('http://www.mapquestapi.com/geocoding/v1/batch');
+    my $uri = URI->new("http://$self->{host}/geocoding/v1/batch");
     $uri->query_form(
         key      => $self->{key},
         location => $locations,
@@ -171,6 +174,8 @@ Creates a new geocoding object.
 
 A valid developer 'apikey' is required. See L</NOTES> on how to obtain one
 and set it up.
+
+Accepts an optional B<open> parameter for using the open data platform.
 
 Accepts an optional B<https> parameter for securing network traffic.
 
@@ -251,12 +256,14 @@ service at this time.
 
 L<http://www.mapquestapi.com/geocoding/>
 
+L<http://developer.mapquest.com/web/tools/getting-started/platform/licensed-vs-open>
+
 =head1 REQUESTS AND BUGS
 
 Please report any bugs or feature requests to
-L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Geo-Coder-Mapquest>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Geo-Coder-Mapquest>. I will
+be notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
 
 =head1 SUPPORT
 
