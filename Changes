@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Mapquest
 
+0.06  Fri Jun 28 14:31:29 UTC 2013
+    - Added option to use the open data platform. (Drew Taylor)
+
 0.05  Wed Mar 30 00:14:37 UTC 2011
     - Required newer LWP with better HTTPS support.
     - Enabled response compression by default
